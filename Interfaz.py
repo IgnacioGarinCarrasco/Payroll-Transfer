@@ -50,7 +50,7 @@ def procesar_excel(archivo_excel):
 # Interfaz Streamlit (Frontend)
 st.title("Automatización Payroll Transfer")
 
-archivo = st.file_uploader("Sube el archivo Excel", type=["xls", "xlsx"])
+archivo = st.file_uploader("Suba el archivo Excel", type=["xls", "xlsx"])
 
 if archivo is not None:
     try:
