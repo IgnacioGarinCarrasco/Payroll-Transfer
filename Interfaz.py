@@ -92,7 +92,7 @@ if archivo is not None:
         st.download_button(
             label="📥 Descargar Excel procesado",
             data=output,
-            file_name="procesado.xlsx",
+            file_name="Payroll Transfer Procesado.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
     except Exception as e:
