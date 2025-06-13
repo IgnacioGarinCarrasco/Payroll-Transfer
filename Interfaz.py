@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 from io import BytesIO
 
+
+# Backend
 def procesar_excel(archivo_excel):
     data = pd.read_excel(archivo_excel)
 
@@ -35,7 +37,7 @@ def procesar_excel(archivo_excel):
             if pd.notna(data.iloc[pos_fila, 17]):
                 nuevo_registro = {
                     'Nombre': str(llave[0]),
-                    'ID': str(llave[1]),
+                    'ID': int(llave[1]),
                     'Cargo': str(llave[2]),
                     'Código de pagos': str(data.iloc[pos_fila, 17]),
                     'Horas': float(data.iloc[pos_fila, 23]) if pd.notna(data.iloc[pos_fila, 23]) else np.nan
@@ -45,10 +47,10 @@ def procesar_excel(archivo_excel):
     return data_procesada
 
 
-# Interfaz Streamlit
-st.title("Procesador de Planilla Excel")
+# Interfaz Streamlit (Frontend)
+st.title("Automatización Payroll Transfer")
 
-archivo = st.file_uploader("Sube un archivo Excel", type=["xls", "xlsx"])
+archivo = st.file_uploader("Sube el archivo Excel", type=["xls", "xlsx"])
 
 if archivo is not None:
     try:
@@ -61,6 +63,30 @@ if archivo is not None:
         output = BytesIO()
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
             df_procesado.to_excel(writer, index=False, sheet_name='Procesado')
+            workbook = writer.book
+            worksheet = writer.sheets['Procesado']
+
+            # Formato para encabezados
+            header_format = workbook.add_format({
+                'bold': True,
+                'bg_color': '#D9E1F2',  # Color claro (azul pálido)
+                'border': 1,
+                'align': 'center',
+                'valign': 'vcenter'
+            })
+
+            # Aplicar formato a los encabezados
+            for col_num, value in enumerate(df_procesado.columns.values):
+                worksheet.write(0, col_num, value, header_format)
+
+            # Formato para las celdas del cuerpo (con bordes)
+            cell_format = workbook.add_format({'border': 1})
+
+            # Aplicar formato con bordes a todas las celdas del DataFrame
+            for row in range(1, len(df_procesado) + 1):
+                for col in range(len(df_procesado.columns)):
+                    worksheet.write(row, col, df_procesado.iloc[row - 1, col], cell_format)
+
         output.seek(0)
 
         st.download_button(
